@@ -1,10 +1,16 @@
-# 🎈 Blank app template
+# 🎈 MC Error Lower Bound Explorer
 
-A simple Streamlit app template for you to modify!
+Interactive Streamlit tool for verifying theoretical Monte Carlo lower bounds for $L^p$ approximation of neural network classes involving $\tanh$ activations.
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
 
-### How to run it on your own machine
+## 🚀 Features
+- Interactive exploration of theoretical error bounds
+- Automatic constraint handling for model parameters
+- Manual override of key variables ($k$, $j$, $s$)
+- Real-time feasibility checks of structural assumptions
+
+## 💻 How to run locally
 
 1. Install the requirements
 
