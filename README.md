@@ -2,7 +2,7 @@
 
 Interactive Streamlit tool for verifying theoretical Monte Carlo lower bounds for $L^p$ approximation of neural network classes involving $\tanh$ activations.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://learning-tanh-nn.streamlit.app/)
 
 ## 🚀 Features
 - Interactive exploration of theoretical error bounds
