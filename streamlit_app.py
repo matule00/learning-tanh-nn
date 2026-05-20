@@ -182,24 +182,31 @@ else:
     j = j_max
 
 
-    use_manual = st.checkbox("Manually adjust $k,j$ and $s$")
+    mode = st.radio("Mode of $j,k$ and $s$", ["automatic", "manual"])
 
-    if use_manual:
-        k = st.number_input(
-            "$k$",
-            min_value=k_min,
-            max_value=L-3,
-            value=k_min
-        )
+    if mode == "automatic":
+        k, j = k_min, j_max
+
+    else:
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            k = st.number_input(
+                "$k$",
+                min_value=k_min,
+                max_value=L-3,
+                value=k_min
+            )
 
         j_max = L - 3 - k
 
-        j = st.number_input(
-            "$j$",
-            min_value=j_min,
-            max_value=j_max,
-            value=j_max
-        )
+        with col2:
+            j = st.number_input(
+                "$j$",
+                min_value=j_min,
+                max_value=j_max,
+                value=j_max
+            )
 
 
     m_max = num_input(r"$m_{\\max}$", 1, 100000, inf_possible=False, auto_possible=False)
@@ -210,14 +217,16 @@ else:
     s_ass = s_assump(m_max, theta, q, B, c, rho_c, tilde_c, j)
 
     s_min = max(1, int(np.ceil(s_ass)))
-    s = s_min
-    if use_manual:
-        s = st.number_input(
-            "$s$",
-            min_value=s_min,
-            max_value=d,
-            value=s_min
-        )
+    if mode == "automatic":
+        s = s_min
+    else:
+        with col3:
+            s = st.number_input(
+                "$s$",
+                min_value=s_min,
+                max_value=d,
+                value=s_min
+            )
 
     P = (L-2)*B**2 + (L+d)*B + 1
 
