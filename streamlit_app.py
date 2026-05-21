@@ -181,10 +181,9 @@ else:
     j_max = L - 3 - k
     j = j_max
 
+    mode = st.checkbox("Set $j,k$ and $s$ automatically", value=True)
 
-    mode = st.radio("Mode of $j,k$ and $s$", ["automatic", "manual"])
-
-    if mode == "automatic":
+    if mode:
         k, j = k_min, j_max
 
     else:
@@ -217,7 +216,7 @@ else:
     s_ass = s_assump(m_max, theta, q, B, c, rho_c, tilde_c, j)
 
     s_min = max(1, int(np.ceil(s_ass)))
-    if mode == "automatic":
+    if mode:
         s = s_min
     else:
         with col3:
@@ -245,7 +244,7 @@ else:
         m_form = r"\cdot m^{-\frac1p}"
         error_formula = r"\operatorname{err}_m^{MC}\!\left(U, L^p([0,1]^d)\right)\;\ge\;"
         worst_error_formula = r"\operatorname{err}_{m_{\max}}^{MC}\!\left(U, L^p([0,1]^d)\right)\;\ge\;"
-        lower_bound_formula = r"\frac{\sqrt{B^{2-\frac{4}{q}}c^2-1}}{4B^{1-\frac{2}{q}}}\cdot\left(\frac{\Omega}{2^{1+\frac{2}{s}}\sqrt{s}}\right)^{\frac{s}{p}}m^{-\frac{1}{p}}"
+        lower_bound_formula = r"c\frac{\sqrt{\tilde c^{\,2}-1}}{4\tilde c}\cdot\left(\frac{\Omega}{2^{1+\frac{2}{s}}\sqrt{s}}\right)^{\frac{s}{p}}m^{-\frac{1}{p}}"
         mantissa, exp = f"{final_const:.2e}".split("e")
         exp = int(exp)
         worst_lower_bound = final_const * m_max ** (-1/p)
@@ -267,11 +266,10 @@ with st.expander("Show computation parameters"):
     k_assump_formula = r"3 + \frac{\ln\!\left( \frac{4c \tilde c}{\varepsilon_p \pi(\tilde c)\left(1+\pi(\tilde c)^{-1}\right)^2} \right)}{\ln \!\left( \frac{\cosh^2\!\left(\tilde c\frac{\pi(\tilde c)-1}{\pi(\tilde c)+1}\right)}{\tilde c} \right)} \le k"
 
     st.markdown("#### Layer allocation")
-    st.divider()
-    st.write("Assumption on $k \\ge 3$:")
+    st.write("Assumption on $3\\le k \\in \\mathbb N$:")
     st.latex(rf"{round(k_ass,2)} = {k_assump_formula} \, .")
 
-    st.write("Assumptions on $j$:")
+    st.write("Assumptions on $j \\in \mathbb N$:")
 
     j_assump_formula = r"\frac{\ln\left( \frac{5 B^{\frac3q}\operatorname{arccosh}\left(\sqrt{\tilde c}\right)\,\rho(\tilde c)}{c^2\tanh(2B^{-1/q}\tanh(\frac c2))\tanh^2\left[B^{-1/q}(c - \tanh(\frac c2))\right]} \right)}{\ln\left(  \frac{\tilde c}{\cosh^2\left[2\operatorname{arccosh}(\sqrt{\tilde c})\rho(\tilde c)\right]} \right)} \leq j"
     st.latex(rf"{round(j_ass, 2)} = {j_assump_formula} \, .")
@@ -281,11 +279,10 @@ with st.expander("Show computation parameters"):
     st.latex(rf"{L_formula} \ge {L_min} \, .")
 
     st.markdown("#### Dimension constraint")
-    st.divider()
+    st.write("Assumption on $s \\in \\mathbb N$:")
 
     s_formula = r"d \;\ge\; s \;\ge\;\frac{2\ln(4m_{\max})}{j\,\ln\!\Big( \frac{\tilde c}{\cosh^2\!\left[2\operatorname{arccosh}(\sqrt{\tilde c})\,\rho(\tilde c)\right]} \Big)+\ln\!\left(\frac{ \Theta\,c^2(c-\tanh(c/2))^2}{16\,B^{5/q}\operatorname{arccosh}(\sqrt{\tilde c})\,\rho(\tilde c)}\right)}"
     st.latex(rf"{s_formula} = {round(s_ass, 2)} \, .")
 
     st.markdown("##### Total number of weight parameters:")
-    st.divider()
     st.latex(rf"P = B^2(L-2) + B(L+d) + 1 = {P}")
