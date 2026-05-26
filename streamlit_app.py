@@ -151,8 +151,8 @@ c = num_input("$c$", 0.0, 2.0, step=0.01, inf_possible=False, auto_possible=Fals
 tilde_c = c_comp(q,B,c)
 rho_c = rho(tilde_c)
 
-st.markdown("### Structural assumptions")
 st.divider()
+st.markdown("### Structural assumptions")
 
 c_formula = r"B^{1-\frac2q}c"
 ass_on_B = r"\qquad \text{and} \qquad B \ge 2d"
@@ -236,8 +236,8 @@ else:
         st.error("$s$ has to be greater than $d$ in order to satisfy the results for all $m \\leq m_{\\max}$, adjust the inputs")
     else:
         # ---- Output ----
-        st.markdown("### Final bound")
         st.divider()
+        st.markdown("### Final bound")
 
         omega = Omega(B, q, c)
         final_const = constant_before_m(B, c, q, p, s, omega)
@@ -249,16 +249,19 @@ else:
         exp = int(exp)
         worst_lower_bound = final_const * m_max ** (-1/p)
 
+        st.markdown(
+            "Every algorithm with precision $\\varepsilon_p$ using $m \\leq m_{\\max}$ samples "
+            "approximating the class of neural networks with input dimension $d$, width $B$, "
+            "depth $L$, and $\\ell^q$-bounded weights by $c$ incurs an $L^p$ error of at least:"
+        )
+
         if final_const < e_p:
-            st.metric("Lower bound constant", f"0")
             st.latex(rf"{error_formula} 0")
             st.error("Lower bound is smaller than machine precision $\\varepsilon_{p}$ for every $m$")
         else:
-            st.metric("Lower bound constant", f"{final_const:.2e}")
             st.latex(rf"{error_formula}{lower_bound_formula} = {mantissa} \cdot 10^{{{exp}}} {m_form}")
             if worst_lower_bound < e_p:
                 st.error("Lower bound is smaller than machine precision for some $m$")
-
 
 
 # optional showing the expressions
