@@ -175,7 +175,7 @@ else:
     L_min = k_min+j_min + 3
 
     if L < L_min:
-        st.error("$L$ too small, cannot push tail error below $\\varepsilon_{p}$, adjust parameters!")
+        st.error("Unable to ensure tail error below $\\varepsilon_{p}$; adjust parameters.")
     else:
 
         # default automatic allocation
@@ -233,9 +233,9 @@ else:
 
         # validity of parameters check
         if s_ass < 0:
-            st.error("Unable to get $s$ positive, adjust the inputs")
+            st.error("No feasible $s > 0$ exists; adjust parameters, $\\varepsilon_p$ or $m_{\\max}$.")
         elif s_ass > d:
-            st.error("$s$ has to be greater than $d$ in order to satisfy the results for all $m \\leq m_{\\max}$, adjust the inputs")
+            st.error("Constraint $s \\le d$ cannot be satisfied; adjust parameters, $\\varepsilon_p$ or $m_{\\max}$.")
         else:
             # ---- Output ----
             st.divider()
