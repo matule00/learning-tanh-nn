@@ -144,6 +144,7 @@ p = num_input("$p$", 1, 4, auto_possible=False)
 q = num_input("$q$", 1, 4, auto_possible=False)
 d = num_input("$d$", 1, 15, inf_possible=False, auto_possible=False)
 B = num_input("$B$", 1, 45, inf_possible=False, auto_possible=False)
+L = num_input("$L$", 7, 12, inf_possible=False, auto_possible=False)
 c = num_input("$c$", 0.0, 2.0, step=0.01, inf_possible=False, auto_possible=False)
 
 
@@ -165,8 +166,6 @@ if tilde_c <= 1:
 elif B < 2*d:
     st.error(r"Violation: $B < 2d$")
 else:
-    st.success("All structural assumptions satisfied.")
-
     e_p = num_input("$\\varepsilon_{p}$", 0.0, 1e-16, step = 1e-16, inf_possible=False, auto_possible=False)
 
     j_ass = j_assump(q, B, c, tilde_c, rho_c)
@@ -174,118 +173,121 @@ else:
     k_ass = k_assump(e_p, c, tilde_c, rho_c)
     k_min = max(3, int(np.ceil(k_ass)))
     L_min = k_min+j_min + 3
-    L = num_input("$L$", min_val=L_min, default=max(L_min, 12), inf_possible=False, auto_possible=False)
 
-    # default automatic allocation
-    k = k_min
-    j_max = L - 3 - k
-    j = j_max
-
-    mode = st.checkbox("Set $j,k$ and $s$ automatically", value=True)
-
-    if mode:
-        k, j = k_min, j_max
-
+    if L < L_min:
+        st.error("$L$ too small, cannot push tail error below $\\varepsilon_{p}$, adjust parameters!")
     else:
-        col1, col2, col3 = st.columns(3)
 
-        with col1:
-            k = st.number_input(
-                "$k$",
-                min_value=k_min,
-                max_value=L-3,
-                value=k_min
-            )
-
+        # default automatic allocation
+        k = k_min
         j_max = L - 3 - k
+        j = j_max
 
-        with col2:
-            j = st.number_input(
-                "$j$",
-                min_value=j_min,
-                max_value=j_max,
-                value=j_max
-            )
+        mode = st.checkbox("Set $j,k$ and $s$ automatically", value=True)
 
+        if mode:
+            k, j = k_min, j_max
 
-    m_max = num_input("$m_{\\max}$", min_val=1e0, default=1e5, step=1e5, inf_possible=False, auto_possible=False)
-
-    theta = Theta(B,q,c)
-    omega = Omega(B,q,c)
-
-    s_ass = s_assump(m_max, theta, q, B, c, rho_c, tilde_c, j)
-
-    s_min = max(1, int(np.ceil(s_ass)))
-    if mode:
-        s = s_min
-    else:
-        with col3:
-            s = st.number_input(
-                "$s$",
-                min_value=s_min,
-                max_value=d,
-                value=s_min
-            )
-
-    P = (L-2)*B**2 + (L+d)*B + 1
-
-    # validity of parameters check
-    if s_ass < 0:
-        st.error("Unable to get $s$ positive, adjust the inputs")
-    elif s_ass > d:
-        st.error("$s$ has to be greater than $d$ in order to satisfy the results for all $m \\leq m_{\\max}$, adjust the inputs")
-    else:
-        # ---- Output ----
-        st.divider()
-        st.markdown("### Final bound")
-
-        omega = Omega(B, q, c)
-        final_const = constant_before_m(B, c, q, p, s, omega)
-        m_form = r"\cdot m^{-\frac1p}"
-        error_formula = r"\operatorname{err}_m^{MC}\!\left(U, L^p([0,1]^d)\right)\;\ge\;"
-        worst_error_formula = r"\operatorname{err}_{m_{\max}}^{MC}\!\left(U, L^p([0,1]^d)\right)\;\ge\;"
-        lower_bound_formula = r"c\frac{\sqrt{\tilde c^{\,2}-1}}{4\tilde c}\cdot\left(\frac{\Omega}{2^{1+\frac{2}{s}}\sqrt{s}}\right)^{\frac{s}{p}}m^{-\frac{1}{p}}"
-        mantissa, exp = f"{final_const:.2e}".split("e")
-        exp = int(exp)
-        worst_lower_bound = final_const * m_max ** (-1/p)
-
-        st.markdown(
-            "Every algorithm with precision $\\varepsilon_p$ using $m \\leq m_{\\max}$ samples "
-            "approximating the class of neural networks with input dimension $d$, width $B$, "
-            "depth $L$, and $\\ell^q$-bounded weights by $c$ incurs an $L^p$ error of at least:"
-        )
-
-        if final_const < e_p:
-            st.latex(rf"{error_formula} 0")
-            st.error("Lower bound is smaller than machine precision $\\varepsilon_{p}$ for every $m$")
         else:
-            st.latex(rf"{error_formula}{lower_bound_formula} = {mantissa} \cdot 10^{{{exp}}} {m_form}")
-            if worst_lower_bound < e_p:
-                st.error("Lower bound is smaller than machine precision for some $m$")
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                k = st.number_input(
+                    "$k$",
+                    min_value=k_min,
+                    max_value=L-3,
+                    value=k_min
+                )
+
+            j_max = L - 3 - k
+
+            with col2:
+                j = st.number_input(
+                    "$j$",
+                    min_value=j_min,
+                    max_value=j_max,
+                    value=j_max
+                )
 
 
-    # optional showing the expressions
-    with st.expander("Show computation parameters"):
-        k_assump_formula = r"3 + \frac{\ln\!\left( \frac{4c \tilde c}{\varepsilon_p \pi(\tilde c)\left(1+\pi(\tilde c)^{-1}\right)^2} \right)}{\ln \!\left( \frac{\cosh^2\!\left(\tilde c\frac{\pi(\tilde c)-1}{\pi(\tilde c)+1}\right)}{\tilde c} \right)} \le k"
+        m_max = num_input("$m_{\\max}$", min_val=1e0, default=1e5, step=1e5, inf_possible=False, auto_possible=False)
 
-        st.markdown("#### Layer allocation")
-        st.write("Assumption on $3\\le k \\in \\mathbb N$:")
-        st.latex(rf"{round(k_ass,2)} = {k_assump_formula} \, .")
+        theta = Theta(B,q,c)
+        omega = Omega(B,q,c)
 
-        st.write("Assumptions on $j \\in \mathbb N$:")
+        s_ass = s_assump(m_max, theta, q, B, c, rho_c, tilde_c, j)
 
-        j_assump_formula = r"\frac{\ln\left( \frac{5 B^{\frac3q}\operatorname{arccosh}\left(\sqrt{\tilde c}\right)\,\rho(\tilde c)}{c^2\tanh(2B^{-1/q}\tanh(\frac c2))\tanh^2\left[B^{-1/q}(c - \tanh(\frac c2))\right]} \right)}{\ln\left(  \frac{\tilde c}{\cosh^2\left[2\operatorname{arccosh}(\sqrt{\tilde c})\rho(\tilde c)\right]} \right)} \leq j"
-        st.latex(rf"{round(j_ass, 2)} = {j_assump_formula} \, .")
-        st.write("Hence:")
+        s_min = max(1, int(np.ceil(s_ass)))
+        if mode:
+            s = s_min
+        else:
+            with col3:
+                s = st.number_input(
+                    "$s$",
+                    min_value=s_min,
+                    max_value=d,
+                    value=s_min
+                )
 
-        L_formula = r"L = 3 + k + j"
-        st.latex(rf"{L_formula} \ge {L_min} \, .")
+        P = (L-2)*B**2 + (L+d)*B + 1
 
-        st.markdown("#### Dimension constraint")
-        st.write("Assumption on $s \\in \\mathbb N$:")
+        # validity of parameters check
+        if s_ass < 0:
+            st.error("Unable to get $s$ positive, adjust the inputs")
+        elif s_ass > d:
+            st.error("$s$ has to be greater than $d$ in order to satisfy the results for all $m \\leq m_{\\max}$, adjust the inputs")
+        else:
+            # ---- Output ----
+            st.divider()
+            st.markdown("### Final bound")
 
-        s_formula = r"d \;\ge\; s \;\ge\;\frac{2\ln(4m_{\max})}{j\,\ln\!\Big( \frac{\tilde c}{\cosh^2\!\left[2\operatorname{arccosh}(\sqrt{\tilde c})\,\rho(\tilde c)\right]} \Big)+\ln\!\left(\frac{ \Theta\,c^2(c-\tanh(c/2))^2}{16\,B^{5/q}\operatorname{arccosh}(\sqrt{\tilde c})\,\rho(\tilde c)}\right)}"
-        st.latex(rf"{s_formula} = {round(s_ass, 2)} \, .")
+            omega = Omega(B, q, c)
+            final_const = constant_before_m(B, c, q, p, s, omega)
+            m_form = r"\cdot m^{-\frac1p}"
+            error_formula = r"\operatorname{err}_m^{MC}\!\left(U, L^p([0,1]^d)\right)\;\ge\;"
+            worst_error_formula = r"\operatorname{err}_{m_{\max}}^{MC}\!\left(U, L^p([0,1]^d)\right)\;\ge\;"
+            lower_bound_formula = r"c\frac{\sqrt{\tilde c^{\,2}-1}}{4\tilde c}\cdot\left(\frac{\Omega}{2^{1+\frac{2}{s}}\sqrt{s}}\right)^{\frac{s}{p}}m^{-\frac{1}{p}}"
+            mantissa, exp = f"{final_const:.2e}".split("e")
+            exp = int(exp)
+            worst_lower_bound = final_const * m_max ** (-1/p)
 
-        st.markdown("##### Total number of weight parameters:")
-        st.latex(rf"P = B^2(L-2) + B(L+d) + 1 = {P}")
+            st.markdown(
+                "Every algorithm with precision $\\varepsilon_p$ using $m \\leq m_{\\max}$ samples "
+                "approximating the class of neural networks with input dimension $d$, width $B$, "
+                "depth $L$, and $\\ell^q$-bounded weights by $c$ incurs an $L^p$ error of at least:"
+            )
+
+            if final_const < e_p:
+                st.latex(rf"{error_formula} 0")
+                st.error("Lower bound is smaller than machine precision $\\varepsilon_{p}$ for every $m$")
+            else:
+                st.latex(rf"{error_formula}{lower_bound_formula} = {mantissa} \cdot 10^{{{exp}}} {m_form}")
+                if worst_lower_bound < e_p:
+                    st.error("Lower bound is smaller than machine precision for some $m$")
+
+
+        # optional showing the expressions
+        with st.expander("Show computation parameters"):
+            k_assump_formula = r"3 + \frac{\ln\!\left( \frac{4c \tilde c}{\varepsilon_p \pi(\tilde c)\left(1+\pi(\tilde c)^{-1}\right)^2} \right)}{\ln \!\left( \frac{\cosh^2\!\left(\tilde c\frac{\pi(\tilde c)-1}{\pi(\tilde c)+1}\right)}{\tilde c} \right)} \le k"
+
+            st.markdown("#### Layer allocation")
+            st.write("Assumption on $3\\le k \\in \\mathbb N$:")
+            st.latex(rf"{round(k_ass,2)} = {k_assump_formula} \, .")
+
+            st.write("Assumptions on $j \\in \mathbb N$:")
+
+            j_assump_formula = r"\frac{\ln\left( \frac{5 B^{\frac3q}\operatorname{arccosh}\left(\sqrt{\tilde c}\right)\,\rho(\tilde c)}{c^2\tanh(2B^{-1/q}\tanh(\frac c2))\tanh^2\left[B^{-1/q}(c - \tanh(\frac c2))\right]} \right)}{\ln\left(  \frac{\tilde c}{\cosh^2\left[2\operatorname{arccosh}(\sqrt{\tilde c})\rho(\tilde c)\right]} \right)} \leq j"
+            st.latex(rf"{round(j_ass, 2)} = {j_assump_formula} \, .")
+            st.write("Hence:")
+
+            L_formula = r"L = 3 + k + j"
+            st.latex(rf"{L_formula} \ge {L_min} \, .")
+
+            st.markdown("#### Dimension constraint")
+            st.write("Assumption on $s \\in \\mathbb N$:")
+
+            s_formula = r"d \;\ge\; s \;\ge\;\frac{2\ln(4m_{\max})}{j\,\ln\!\Big( \frac{\tilde c}{\cosh^2\!\left[2\operatorname{arccosh}(\sqrt{\tilde c})\,\rho(\tilde c)\right]} \Big)+\ln\!\left(\frac{ \Theta\,c^2(c-\tanh(c/2))^2}{16\,B^{5/q}\operatorname{arccosh}(\sqrt{\tilde c})\,\rho(\tilde c)}\right)}"
+            st.latex(rf"{s_formula} = {round(s_ass, 2)} \, .")
+
+            st.markdown("##### Total number of weight parameters:")
+            st.latex(rf"P = B^2(L-2) + B(L+d) + 1 = {P}")
