@@ -253,8 +253,8 @@ else:
 
             st.markdown(
                 "Every algorithm with precision $\\varepsilon_p$ using $m \\leq m_{\\max}$ samples "
-                "approximating the~class of~neural networks with~input dimension $d$, width $B$, "
-                "depth $L$, and~$\\ell^q$-bounded weights by~$c$ incurs an~$L^p$ error of~at~least:"
+                "approximating the class of neural networks with input dimension $d$, width $B$, "
+                "depth $L$, and $\\ell^q$-bounded weights by $c$ incurs an $L^p$ error of at least:"
             )
 
             if final_const < e_p:
