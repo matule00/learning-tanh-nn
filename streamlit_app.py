@@ -3,8 +3,8 @@ import numpy as np
 
 st.set_page_config(layout="wide")
 
-st.title("MC Error Lower Bound Explorer")
-st.caption("Interactive verification of theoretical Monte Carlo lower bounds of error in $L^p$ approximation of classes containg $\\tanh$ neural networks.")
+st.title("MC Error Lower Bound for Tanh NNs")
+st.caption("Interactive verification of Monte Carlo lower bounds of error in $L^p$ approximation of classes containg $\\tanh$ neural networks.")
 
 
 # helper for sidebar inputs with optional ∞ / auto locking
@@ -253,8 +253,8 @@ else:
 
             st.markdown(
                 "Every algorithm with precision $\\varepsilon_p$ using $m \\leq m_{\\max}$ samples "
-                "approximating the class of neural networks with input dimension $d$, width $B$, "
-                "depth $L$, and $\\ell^q$-bounded weights by $c$ incurs an $L^p$ error of at least:"
+                "approximating the~class of~neural networks with~input dimension $d$, width $B$, "
+                "depth $L$, and~$\\ell^q$-bounded weights by~$c$ incurs an~$L^p$ error of~at~least:"
             )
 
             if final_const < e_p:
