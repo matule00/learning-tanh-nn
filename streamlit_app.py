@@ -78,7 +78,7 @@ def constant_before_m(B, c, q, p, s, omega):
 
 def Theta(B,q,c):
     B_tanh = B **(-1/q) * np.tanh(c/2)
-    return np.tanh(B_tanh) / (20 * np.cosh(B_tanh)**2)
+    return 9 * np.tanh(B_tanh) / (50 * (np.cosh(B_tanh))**2)
 
 
 def Omega(B,q,c):
