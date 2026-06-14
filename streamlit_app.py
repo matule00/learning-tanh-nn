@@ -4,8 +4,18 @@ import numpy as np
 st.set_page_config(layout="wide")
 
 st.title("MC Error Lower Bound for Tanh NNs")
-st.caption("Interactive verification of Monte Carlo lower bounds of error in $L^p$ approximation of classes containg $\\tanh$ neural networks.")
+st.caption(
+    r"""
+    Interactive verification of Monte Carlo lower bounds for $L^p$ approximation
+    of classes containing $\tanh$ neural networks.
+    """
+)
 
+st.info(
+    "📄 Paper: "
+    "[*Limitations of Learning Tanh Neural Networks with Finite Precision*]"
+    "(https://arxiv.org/abs/2606.11104)"
+)
 
 # helper for sidebar inputs with optional ∞ / auto locking
 def num_input(name, min_val, default, inf_possible=True, max_val=None, step=1, auto_possible=True):
